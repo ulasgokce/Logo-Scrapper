@@ -8,6 +8,7 @@ const storage = new Storage({ keyFilename: "tendex-286812-b2a23e63566e.json" });
 const bucket = storage.bucket("tendex-company-logos");
 
 var mysql = require("mysql");
+const { error } = require("console");
 
 try {
   var con = mysql.createConnection({
@@ -36,7 +37,6 @@ function scheduler() {
   setTimeout(function () { 
     getCompanies().then((companies) => {
       companies.forEach((company) => {
-        console.log(company["website"]);
         download_image(
           "https://logo.clearbit.com/" + company["website"],
           company["website"]
@@ -44,10 +44,20 @@ function scheduler() {
           .then(() => {
             console.log('Uploading',company['website']);
             bucket.upload(company["website"]).then(()=>{
-              const blob = bucket.file(company["website"]).makePublic();
-              updateCompany(blob, company);
-              fs.unlinkSync(company['website'])
-              scheduler();
+              try {
+                fs.unlink(company['website'],function (err) {
+                  if (err){
+                    console.log(err);
+                  }
+                  bucket.file(company["website"]).makePublic();
+                  updateCompany(company);               
+                  scheduler();
+                })
+            } catch (error) {
+              console.log(error);
+            }
+            })  .catch((error) => {
+              console.log(error);
             });
           })
           .catch((error) => {
@@ -66,6 +76,7 @@ function getCompanies() {
           if (err) {
             reject(err);
           } else {
+            console.log('getting company information');
             resolve(result);
           }
         }
@@ -75,14 +86,11 @@ function getCompanies() {
     }
   });
 }
-function updateCompany(blob,company) {
+function updateCompany(company) {
   try {
     con.query(
-      "UPDATE organizations SET company_img_url = '" +
-        blob.public_url +
-        "' ,company_image_url_checked = 1 WHERE id = '" +
-        company["id"] +
-        "'"
+      `UPDATE organizations SET company_img_url = 'https://storage.googleapis.com/tendex-company-logos/${company["website"]}' , company_image_url_checked = 1 WHERE id =
+       '${ company["id"]}'`
     );
   } catch (error) {
     console.log("couldn't update data");
