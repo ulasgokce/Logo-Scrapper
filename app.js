@@ -71,7 +71,7 @@ function getCompanies() {
   return new Promise(async (resolve, reject) => {
     try {
       con.query(
-        `SELECT id, website FROM organizations WHERE company_image_url_checked IS NULL AND website IS NOT NULL LIMIT 600`,
+        `SELECT id, website FROM organizations WHERE company_image_url_checked IS NULL AND website IS NOT NULL LIMIT 1000`,
         function (err, result) {
           if (err) {
             reject(err);
