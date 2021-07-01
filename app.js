@@ -8,7 +8,6 @@ const storage = new Storage({ keyFilename: "tendex-286812-b2a23e63566e.json" });
 const bucket = storage.bucket("tendex-company-logos");
 
 var mysql = require("mysql");
-const { error } = require("console");
 
 try {
   var con = mysql.createConnection({
@@ -30,43 +29,43 @@ try {
 }
 app.listen(port, () => {
   console.log("getStarted", new Date());
-  scheduler(); 
-});
 
-function scheduler() {
-  setTimeout(function () { 
+  setInterval(()=> {
     getCompanies().then((companies) => {
-      companies.forEach((company) => {
+      for (let i = 0; i < companies.length; i++) {
         download_image(
-          "https://logo.clearbit.com/" + company["website"],
-          company["website"]
+          "https://logo.clearbit.com/" + companies[i]["website"],
+          companies[i]["website"]
         )
           .then(() => {
-            console.log('Uploading',company['website']);
-            bucket.upload(company["website"]).then(()=>{
+            console.log(companies[i]['id']);
+            bucket.upload(companies[i]["website"],()=>{
               try {
-                fs.unlink(company['website'],function (err) {
+                fs.unlink(companies[i]['website'],function (err) {                  
                   if (err){
                     console.log(err);
                   }
-                  bucket.file(company["website"]).makePublic();
-                  updateCompany(company);               
-                  scheduler();
+                  bucket.file(companies[i]["website"]).makePublic();
+                  updateCompany(companies[i]);  
                 })
             } catch (error) {
               console.log(error);
             }
-            })  .catch((error) => {
-              console.log(error);
-            });
+            })
           })
           .catch((error) => {
-            console.log(error);
+            //download image error
+            // console.log(error);
           });
-      });
+      };
     });
-   }, 60000);
-}
+  },60000)
+ 
+ 
+ 
+});
+
+
 function getCompanies() {
   return new Promise(async (resolve, reject) => {
     try {
@@ -109,7 +108,7 @@ const download_image = (url, image_path) => {
           resolve(response.data.pipe(fs.createWriteStream(image_path)));
         })
         .catch((error) => {
-          reject('error on axios download_image')
+          reject('error on axios download_image '+url)
         });
     } catch (error) {
       console.log(image_path);
