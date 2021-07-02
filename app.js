@@ -54,8 +54,9 @@ app.listen(port, () => {
             })
           })
           .catch((error) => {
-            //download image error
+            // download image error
             // console.log(error);
+            updateCompany(companies[i]);  
           });
       };
     });
