@@ -89,8 +89,13 @@ function getCompanies() {
 function updateCompany(company) {
   try {
     con.query(
-      `UPDATE organizations SET company_img_url = 'https://storage.googleapis.com/tendex-company-logos/${company["website"]}' , company_image_url_checked = 1 WHERE id =
-       '${ company["id"]}'`
+      `UPDATE organizations SET company_img_url = "https://storage.googleapis.com/tendex-company-logos/${company["website"]}" , company_image_url_checked = 1 WHERE id =
+       "${ company["id"]}"`,
+       function (err) {
+        if (err) {
+          console.log(err);
+        } 
+      }
     );
   } catch (error) {
     console.log("couldn't update data");
