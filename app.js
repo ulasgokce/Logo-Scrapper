@@ -39,6 +39,7 @@ app.listen(port, () => {
                   websites.push(website);
                   if (websites.length == companies.length) {
                     updateCompany(websites);
+                    console.log('done');
                   }
                 });
               } catch (error) {}
@@ -52,6 +53,8 @@ app.listen(port, () => {
             websites.push(website);
             if (websites.length == companies.length) {
               updateCompany(websites);
+              console.log('done');
+
             }
           });
        
@@ -104,7 +107,7 @@ function getCompanies() {
   return new Promise(async (resolve, reject) => {
     try {
       axios
-        .post("http://127.0.0.1:8000/api/v1/services/logos/get", {
+        .post("https://api-tendex.de/api/v1/services/logos/get", {
           private_key: "11620eab-b5b6-4494-8112-46d658ddf513",
           limit: 500,
         })
@@ -125,7 +128,7 @@ function getCompanies() {
 function updateCompany(websites) {
   try {
     axios
-      .post("http://127.0.0.1:8000/api/v1/services/logos/update", {
+      .post("https://api-tendex.de/api/v1/services/logos/update", {
         private_key: "11620eab-b5b6-4494-8112-46d658ddf513",
         websites: websites,
       })
