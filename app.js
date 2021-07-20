@@ -80,7 +80,7 @@ function getCompanies() {
       axios
         .post("https://api-tendex.de/api/v1/services/logos/get", {
           private_key: "11620eab-b5b6-4494-8112-46d658ddf513",
-          limit:500,
+          limit:100,
         })
         .then((result) => {
           resolve(result.data);
