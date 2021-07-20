@@ -85,7 +85,7 @@ app.post("/company-logo", jsonParser, function (req, res) {
               websites.push(website);
               updateCompany(websites);
               console.log('done');  
-              res.sendStatus(200);
+              res.send('https://storage.googleapis.com/tendex-company-logos/' + website['link']);
             });
           } catch (error) {
             console.log(error);
@@ -93,7 +93,7 @@ app.post("/company-logo", jsonParser, function (req, res) {
         });
       })
       .catch((error) => {
-        res.sendStatus(200);
+        res.send('https://storage.googleapis.com/tendex-images/images/tendexplaceholder.png');
         let website = {
           link: req.body.website,
           found: false,
