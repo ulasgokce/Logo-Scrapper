@@ -79,7 +79,7 @@ app.post("/company-logo", jsonParser, function (req, res) {
               }
               bucket.file(req.body.website).makePublic();
               let website = {
-                link: companies[i]["website"],
+                link: req.body.website,
                 found: true,
               };
               websites.push(website);
@@ -97,7 +97,7 @@ app.post("/company-logo", jsonParser, function (req, res) {
       .catch((error) => {
         res.sendStatus(200);
         let website = {
-          link: companies[i]["website"],
+          link: req.body.website,
           found: false,
         };
         websites.push(website);
