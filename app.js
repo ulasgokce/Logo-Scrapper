@@ -79,7 +79,7 @@ function getCompanies() {
   return new Promise(async (resolve, reject) => {
     try {
       axios
-        .post(" http://127.0.0.1:8000/api/v1/services/logos/get", {
+        .post("https://api-tendex.de/api/v1/services/logos/get", {
           private_key: "11620eab-b5b6-4494-8112-46d658ddf513",
         })
         .then((result) => {
@@ -98,7 +98,7 @@ function getCompanies() {
 function updateCompany(website, bool) {
   try {
     axios
-      .post(" http://127.0.0.1:8000/api/v1/services/logos/update", {
+      .post("https://api-tendex.de/api/v1/services/logos/update", {
         private_key: "11620eab-b5b6-4494-8112-46d658ddf513",
         website: website,
         found: bool,
