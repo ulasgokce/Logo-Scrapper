@@ -3,7 +3,7 @@ const axios = require("axios");
 const fs = require("fs");
 const { Storage } = require("@google-cloud/storage");
 
-var bodyParser = require('body-parser')
+var bodyParser = require("body-parser");
 
 const port = process.env.PORT || 5000;
 const storage = new Storage({ keyFilename: "tendex-286812-b2a23e63566e.json" });
@@ -15,9 +15,10 @@ var jsonParser = bodyParser.json();
 
 app.listen(port, () => {
   console.log("getStarted", new Date());
-
+  let websites = [];
   setInterval(() => {
     getCompanies().then((companies) => {
+      websites = [];
       for (let i = 0; i < companies.length; i++) {
         download_image(
           "https://logo.clearbit.com/" + companies[i]["website"],
@@ -31,22 +32,37 @@ app.listen(port, () => {
                     console.log(err);
                   }
                   bucket.file(companies[i]["website"]).makePublic();
-                  updateCompany(companies[i]["website"], true);
+                  let website = {
+                    link: companies[i]["website"],
+                    found: true,
+                  };
+                  websites.push(website);
+                  if (websites.length == companies.length) {
+                    updateCompany(websites);
+                  }
                 });
-              } catch (error) {
-              }
+              } catch (error) {}
             });
           })
           .catch((error) => {
-            updateCompany(companies[i]["website"], false);
+            let website = {
+              link: companies[i]["website"],
+              found: false,
+            };
+            websites.push(website);
+            if (websites.length == companies.length) {
+              updateCompany(websites);
+            }
           });
+       
       }
     });
   }, 60000);
 });
 
-app.post('/company-logo', jsonParser, function (req, res) {
-  if(req.body.private_key == '11620eab-b5b6-4494-8112-46d658ddf513'){
+app.post("/company-logo", jsonParser, function (req, res) {
+  websites = [];
+  if (req.body.private_key == "11620eab-b5b6-4494-8112-46d658ddf513") {
     download_image(
       "https://logo.clearbit.com/" + req.body.website,
       req.body.website
@@ -59,8 +75,12 @@ app.post('/company-logo', jsonParser, function (req, res) {
                 console.log(err);
               }
               bucket.file(req.body.website).makePublic();
-              updateCompany(req.body.website, true);
-              res.sendStatus(200); 
+              let website = {
+                link: companies[i]["website"],
+                found: true,
+              };
+              websites.push(website);
+              res.sendStatus(200);
             });
           } catch (error) {
             console.log(error);
@@ -68,25 +88,31 @@ app.post('/company-logo', jsonParser, function (req, res) {
         });
       })
       .catch((error) => {
-        updateCompany(req.body.website, false);
-        res.sendStatus(200); 
+        res.sendStatus(200);
+        let website = {
+          link: companies[i]["website"],
+          found: false,
+        };
+        websites.push(website);
       });
+    updateCompany(websites);
   }
-})
-
+});
+// https://api-tendex.de/api/v1/services/logos/get
+// http://127.0.0.1:8000/api/v1/services/logos/get
 function getCompanies() {
   return new Promise(async (resolve, reject) => {
     try {
       axios
-        .post("https://api-tendex.de/api/v1/services/logos/get", {
+        .post("http://127.0.0.1:8000/api/v1/services/logos/get", {
           private_key: "11620eab-b5b6-4494-8112-46d658ddf513",
-          limit:100,
+          limit: 500,
         })
         .then((result) => {
           resolve(result.data);
         })
         .catch((err) => {
-          reject(err)
+          reject(err);
         });
     } catch (error) {
       console.log("couldn't get data");
@@ -94,13 +120,14 @@ function getCompanies() {
   });
 }
 
-function updateCompany(website, bool) {
+// https://api-tendex.de/api/v1/services/logos/update
+// http://127.0.0.1:8000/api/v1/services/logos/update
+function updateCompany(websites) {
   try {
     axios
-      .post("https://api-tendex.de/api/v1/services/logos/update", {
+      .post("http://127.0.0.1:8000/api/v1/services/logos/update", {
         private_key: "11620eab-b5b6-4494-8112-46d658ddf513",
-        website: website,
-        found: bool,
+        websites: websites,
       })
       .catch((err) => {
         console.log(err);
