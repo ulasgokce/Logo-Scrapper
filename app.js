@@ -103,7 +103,7 @@ function updateCompany(website, bool) {
         found: bool,
       })
       .catch((err) => {
-        console.log(err.data);
+        console.log(err);
       });
   } catch (error) {
     console.log("couldn't update data");
