@@ -16,34 +16,34 @@ var jsonParser = bodyParser.json();
 app.listen(port, () => {
   console.log("getStarted", new Date());
 
-  // setInterval(() => {
-  //   getCompanies().then((companies) => {
-  //     for (let i = 0; i < companies.length; i++) {
-  //       download_image(
-  //         "https://logo.clearbit.com/" + companies[i]["website"],
-  //         companies[i]["website"]
-  //       )
-  //         .then(() => {
-  //           bucket.upload(companies[i]["website"], () => {
-  //             try {
-  //               fs.unlink(companies[i]["website"], function (err) {
-  //                 if (err) {
-  //                   console.log(err);
-  //                 }
-  //                 bucket.file(companies[i]["website"]).makePublic();
-  //                 updateCompany(companies[i], true);
-  //               });
-  //             } catch (error) {
-  //               console.log(error);
-  //             }
-  //           });
-  //         })
-  //         .catch((error) => {
-  //           updateCompany(companies[i], false);
-  //         });
-  //     }
-  //   });
-  // }, 60000);
+  setInterval(() => {
+    getCompanies().then((companies) => {
+      for (let i = 0; i < companies.length; i++) {
+        download_image(
+          "https://logo.clearbit.com/" + companies[i]["website"],
+          companies[i]["website"]
+        )
+          .then(() => {
+            bucket.upload(companies[i]["website"], () => {
+              try {
+                fs.unlink(companies[i]["website"], function (err) {
+                  if (err) {
+                    console.log(err);
+                  }
+                  bucket.file(companies[i]["website"]).makePublic();
+                  updateCompany(companies[i]["website"], true);
+                });
+              } catch (error) {
+                console.log(error);
+              }
+            });
+          })
+          .catch((error) => {
+            updateCompany(companies[i]["website"], false);
+          });
+      }
+    });
+  }, 60000);
 });
 
 app.post('/company-logo', jsonParser, function (req, res) {
@@ -81,6 +81,7 @@ function getCompanies() {
       axios
         .post("https://api-tendex.de/api/v1/services/logos/get", {
           private_key: "11620eab-b5b6-4494-8112-46d658ddf513",
+          limit:500,
         })
         .then((result) => {
           resolve(result.data);
