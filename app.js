@@ -87,7 +87,6 @@ function getCompanies() {
         })
         .catch((err) => {
           reject(err)
-          console.log(err.data);
         });
     } catch (error) {
       console.log("couldn't get data");
