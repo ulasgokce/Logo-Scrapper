@@ -34,7 +34,6 @@ app.listen(port, () => {
                   updateCompany(companies[i]["website"], true);
                 });
               } catch (error) {
-                console.log(error);
               }
             });
           })
@@ -113,7 +112,6 @@ function updateCompany(website, bool) {
 }
 
 const download_image = (url, image_path) => {
-  console.log(url, "image being downloaded");
   return new Promise(async (resolve, reject) => {
     try {
       axios({
