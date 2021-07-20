@@ -87,7 +87,7 @@ function getCompanies() {
         })
         .catch((err) => {
           reject(err)
-          console.log(err);
+          console.log(err.data);
         });
     } catch (error) {
       console.log("couldn't get data");
@@ -104,7 +104,7 @@ function updateCompany(website, bool) {
         found: bool,
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.data);
       });
   } catch (error) {
     console.log("couldn't update data");
