@@ -83,10 +83,8 @@ app.post("/company-logo", jsonParser, function (req, res) {
                 found: true,
               };
               websites.push(website);
-              if (websites.length == companies.length) {
-                updateCompany(websites);
-                console.log('done');  
-              }
+              updateCompany(websites);
+              console.log('done');  
               res.sendStatus(200);
             });
           } catch (error) {
@@ -101,11 +99,8 @@ app.post("/company-logo", jsonParser, function (req, res) {
           found: false,
         };
         websites.push(website);
-        if (websites.length == companies.length) {
           updateCompany(websites);
           console.log('done');
-
-        }
       });
   }
 });
