@@ -79,7 +79,7 @@ app.post("/company-logo", jsonParser, function (req, res) {
               console.log("done");
               res.send(
                 "https://storage.googleapis.com/tendex-company-logos/" +
-                  website["link"]
+                req.body.website
               );
             });
           } catch (error) {
