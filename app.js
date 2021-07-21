@@ -64,8 +64,8 @@ app.listen(port, () => {
 app.post("/company-logo", jsonParser, function (req, res) {
   download_url = "https://logo.clearbit.com/" + req.body.website;
   if (req.body.private_key == "11620eab-b5b6-4494-8112-46d658ddf513") {
-    if (req.body.image_link != null) {
-      download_url = req.body.imageLink;
+    if (req.body.image_download_link != null) {
+      download_url = req.body.image_download_link;
     }
     download_image(download_url, req.body.website)
       .then(() => {
