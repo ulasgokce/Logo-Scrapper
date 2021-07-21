@@ -39,7 +39,7 @@ app.listen(port, () => {
                   websites.push(website);
                   if (websites.length == companies.length) {
                     updateCompany(websites);
-                    console.log('done');
+                    console.log("done");
                   }
                 });
               } catch (error) {}
@@ -53,23 +53,21 @@ app.listen(port, () => {
             websites.push(website);
             if (websites.length == companies.length) {
               updateCompany(websites);
-              console.log('done');
-
+              console.log("done");
             }
           });
-       
       }
     });
   }, 60000);
 });
 
 app.post("/company-logo", jsonParser, function (req, res) {
-  websites = [];
+  download_url = "https://logo.clearbit.com/" + req.body.website;
   if (req.body.private_key == "11620eab-b5b6-4494-8112-46d658ddf513") {
-    download_image(
-      "https://logo.clearbit.com/" + req.body.website,
-      req.body.website
-    )
+    if (req.body.image_link != null) {
+      download_url = req.body.imageLink;
+    }
+    download_image(download_url, req.body.website)
       .then(() => {
         bucket.upload(req.body.website, () => {
           try {
@@ -78,14 +76,11 @@ app.post("/company-logo", jsonParser, function (req, res) {
                 console.log(err);
               }
               bucket.file(req.body.website).makePublic();
-              let website = {
-                link: req.body.website,
-                found: true,
-              };
-              websites.push(website);
-              updateCompany(websites);
-              console.log('done');  
-              res.send('https://storage.googleapis.com/tendex-company-logos/' + website['link']);
+              console.log("done");
+              res.send(
+                "https://storage.googleapis.com/tendex-company-logos/" +
+                  website["link"]
+              );
             });
           } catch (error) {
             console.log(error);
@@ -93,14 +88,10 @@ app.post("/company-logo", jsonParser, function (req, res) {
         });
       })
       .catch((error) => {
-        res.send('https://storage.googleapis.com/tendex-images/images/tendexplaceholder.png');
-        let website = {
-          link: req.body.website,
-          found: false,
-        };
-        websites.push(website);
-          updateCompany(websites);
-          console.log('done');
+        res.send(
+          "https://storage.googleapis.com/tendex-images/images/tendexplaceholder.png"
+        );
+        console.log("done");
       });
   }
 });
