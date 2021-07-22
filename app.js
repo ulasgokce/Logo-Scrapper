@@ -62,20 +62,20 @@ app.listen(port, () => {
 });
 
 app.post("/company-logo", jsonParser, function (req, res) {
-  download_url = "https://logo.clearbit.com/" + req.body.website;
-  if (req.body.private_key == "11620eab-b5b6-4494-8112-46d658ddf513") {
+  if (req.body.private_key == "11620eab-b5b6-4494-8112-46d658ddf513" && req.body.website!=null ) {
     if (req.body.image_download_link != null) {
-      download_url = req.body.image_download_link;
-    }
-    download_image(download_url, req.body.website)
+      download_image(req.body.image_download_link, req.body.website)
       .then(() => {
-        bucket.upload(req.body.website, () => {
+        bucket.upload(req.body.website,{
+          destination : bucket.file(req.body.website),
+          public:true
+        }, function(uploadErr, uploadFile) { 
+          console.log(uploadErr,uploadFile);
           try {
             fs.unlink(req.body.website, function (err) {
               if (err) {
                 console.log(err);
               }
-              bucket.file(req.body.website).makePublic();
               console.log("done");
               res.send(
                 "https://storage.googleapis.com/tendex-company-logos/" +
@@ -93,6 +93,52 @@ app.post("/company-logo", jsonParser, function (req, res) {
         );
         console.log("done");
       });
+    }else{
+      let file = bucket.file(req.body.website)
+      file.exists().then(function(data) {
+        const exists = data[0];  
+        if (!exists) {
+          download_image("https://logo.clearbit.com/" + req.body.website, req.body.website)
+          .then(() => {
+            bucket.upload(req.body.website,{
+              destination : bucket.file(req.body.website),
+              public:true
+            }, function(uploadErr, uploadFile) { 
+              console.log(uploadErr,uploadFile);
+              try {
+                fs.unlink(req.body.website, function (err) {
+                  if (err) {
+                    console.log(err);
+                  }
+                  console.log("done");
+                  res.send(
+                    "https://storage.googleapis.com/tendex-company-logos/" +
+                    req.body.website
+                  );
+                });
+              } catch (error) {
+                console.log(error);
+              }
+            });
+          })
+          .catch((error) => {
+          console.log('Image download axios error');
+            res.send(
+              "https://storage.googleapis.com/tendex-images/images/tendexplaceholder.png"
+            );
+            console.log("done");
+          });
+        }else{
+          console.log('Company Logo Already Exists');
+          res.send(
+            "https://storage.googleapis.com/tendex-company-logos/" +
+            req.body.website
+          );
+        }
+  
+      });
+    }
+   
   }
 });
 // https://api-tendex.de/api/v1/services/logos/get
