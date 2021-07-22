@@ -69,8 +69,7 @@ app.post("/company-logo", jsonParser, function (req, res) {
         bucket.upload(req.body.website,{
           destination : bucket.file(req.body.website),
           public:true
-        }, function(uploadErr, uploadFile) { 
-          console.log(uploadErr,uploadFile);
+        }, function(uploadErr, uploadFile) {
           try {
             fs.unlink(req.body.website, function (err) {
               if (err) {
